@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     const improved = await improvePrompt(description);
     return NextResponse.json({ improved });
   } catch (error) {
-    console.error("Improve error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Improve error:", msg);
     return NextResponse.json(
-      { error: "Failed to improve prompt" },
+      { error: msg },
       { status: 500 }
     );
   }

@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     const builderData = await extractBuilderData(description);
     return NextResponse.json(builderData);
   } catch (error) {
-    console.error("Extract error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Extract error:", msg);
     return NextResponse.json(
-      { error: "Failed to extract builder data" },
+      { error: msg },
       { status: 500 }
     );
   }

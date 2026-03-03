@@ -32,9 +32,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(agent);
   } catch (error) {
-    console.error("Generate error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Generate error:", msg);
     return NextResponse.json(
-      { error: "Failed to generate agent" },
+      { error: msg },
       { status: 500 }
     );
   }

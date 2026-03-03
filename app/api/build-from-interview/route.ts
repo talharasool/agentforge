@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     const builderData = await buildFromInterview({ description, answers });
     return NextResponse.json(builderData);
   } catch (error) {
-    console.error("Build from interview error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Build from interview error:", msg);
     return NextResponse.json(
-      { error: "Failed to build from interview" },
+      { error: msg },
       { status: 500 }
     );
   }

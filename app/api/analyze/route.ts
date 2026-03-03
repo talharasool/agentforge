@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     const analysis = await analyzePrompt(description);
     return NextResponse.json(analysis);
   } catch (error) {
-    console.error("Analyze error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Analyze error:", msg);
     return NextResponse.json(
-      { error: "Failed to analyze prompt" },
+      { error: msg },
       { status: 500 }
     );
   }

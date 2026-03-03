@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     const questions = await generateInterview(description);
     return NextResponse.json({ questions });
   } catch (error) {
-    console.error("Interview error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Interview error:", msg);
     return NextResponse.json(
-      { error: "Failed to generate interview questions" },
+      { error: msg },
       { status: 500 }
     );
   }
