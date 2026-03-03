@@ -1,8 +1,8 @@
-# AgentForge
+# AgntForge
 
 Build production-ready Claude Code agent configurations in minutes — no prompt engineering required.
 
-AgentForge is an AI-powered tool that lets anyone (even non-technical users) create fully configured Claude Code agents through a smart interview process and visual builder.
+AgntForge is an AI-powered tool that lets anyone (even non-technical users) create fully configured Claude Code agents through a smart interview process and visual builder.
 
 ## Features
 

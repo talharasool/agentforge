@@ -275,7 +275,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-bold tracking-tight text-white">
-                AgentForge
+                AgntForge
               </h1>
               <p className="hidden sm:block text-[11px] text-zinc-500">
                 Build Claude Code agents without writing prompts

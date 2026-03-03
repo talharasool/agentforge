@@ -1,4 +1,4 @@
-Build a full-stack web application called "AgentForge" — a tool that helps developers build Claude Code agents without needing to know how to write prompts.
+Build a full-stack web application called "AgntForge" — a tool that helps developers build Claude Code agents without needing to know how to write prompts.
 
 ## Core Features
 

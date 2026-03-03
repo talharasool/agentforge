@@ -7,12 +7,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://agentforge.dev";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://agntforge.vercel.app";
 
 export const metadata: Metadata = {
   title: {
-    default: "AgentForge — Build Claude Code Agents Without Writing Prompts",
-    template: "%s | AgentForge",
+    default: "AgntForge — Build Claude Code Agents Without Writing Prompts",
+    template: "%s | AgntForge",
   },
   description:
     "Build production-ready Claude Code agent configurations in minutes. Smart interview, visual builder, and AI-powered generation — no prompt engineering required.",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Talha Rasool" }],
   creator: "Talha Rasool",
-  publisher: "AgentForge",
+  publisher: "AgntForge",
   metadataBase: new URL(SITE_URL),
   alternates: {
     canonical: "/",
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: SITE_URL,
-    siteName: "AgentForge",
-    title: "AgentForge — Build Claude Code Agents Without Writing Prompts",
+    siteName: "AgntForge",
+    title: "AgntForge — Build Claude Code Agents Without Writing Prompts",
     description:
       "Build production-ready Claude Code agent configurations in minutes. Smart interview, visual builder, and AI-powered generation — no prompt engineering required.",
     images: [
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AgentForge — AI Agent Builder",
+        alt: "AgntForge — AI Agent Builder",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgentForge — Build Claude Code Agents Without Writing Prompts",
+    title: "AgntForge — Build Claude Code Agents Without Writing Prompts",
     description:
       "Build production-ready Claude Code agent configurations in minutes. No prompt engineering required.",
     images: ["/og-image.png"],
@@ -89,7 +89,7 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "AgentForge",
+    name: "AgntForge",
     description:
       "Build production-ready Claude Code agent configurations in minutes without writing prompts.",
     url: SITE_URL,
