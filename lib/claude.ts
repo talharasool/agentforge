@@ -1,11 +1,37 @@
-import Groq from "groq-sdk";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const MODEL = "llama-3.3-70b-versatile";
 
-let _groq: Groq | null = null;
-function groq(): Groq {
-  if (!_groq) {
-    _groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+interface GroqMessage {
+  role: "user" | "system" | "assistant";
+  content: string;
+}
+
+async function groqChat(
+  messages: GroqMessage[],
+  opts: { temperature?: number; max_tokens?: number; json?: boolean } = {}
+): Promise<string> {
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages,
+      temperature: opts.temperature ?? 0.3,
+      max_tokens: opts.max_tokens ?? 4096,
+      ...(opts.json ? { response_format: { type: "json_object" } } : {}),
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Groq API error (${res.status}): ${err}`);
   }
-  return _groq;
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? "";
 }
 
 export interface PromptAnalysis {
@@ -24,9 +50,8 @@ export interface GeneratedAgent {
 export async function analyzePrompt(
   description: string
 ): Promise<PromptAnalysis> {
-  const completion = await groq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
+  const text = await groqChat(
+    [
       {
         role: "user",
         content: `You are a prompt engineering expert. Analyze this agent description and return a JSON assessment.
@@ -54,11 +79,8 @@ Scoring criteria:
 Only suggest what's genuinely missing. If the description is thorough, give fewer suggestions.`,
       },
     ],
-    temperature: 0.3,
-    response_format: { type: "json_object" },
-  });
-
-  const text = completion.choices[0]?.message?.content ?? "";
+    { temperature: 0.3, json: true }
+  );
 
   try {
     return JSON.parse(text) as PromptAnalysis;
@@ -68,9 +90,8 @@ Only suggest what's genuinely missing. If the description is thorough, give fewe
 }
 
 export async function improvePrompt(description: string): Promise<string> {
-  const completion = await groq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
+  const text = await groqChat(
+    [
       {
         role: "user",
         content: `You are a prompt engineering expert. Take this agent description and rewrite it to be more complete and effective.
@@ -90,11 +111,10 @@ Improve it by:
 Return ONLY the improved description text. No JSON, no markdown fences, no explanations — just the improved description ready to paste into a text field.`,
       },
     ],
-    temperature: 0.4,
-    max_tokens: 1024,
-  });
+    { temperature: 0.4, max_tokens: 1024 }
+  );
 
-  return completion.choices[0]?.message?.content ?? description;
+  return text || description;
 }
 
 export interface ExtractedBuilder {
@@ -111,9 +131,8 @@ export interface ExtractedBuilder {
 export async function extractBuilderData(
   description: string
 ): Promise<ExtractedBuilder> {
-  const completion = await groq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
+  const text = await groqChat(
+    [
       {
         role: "user",
         content: `You are an expert at understanding agent descriptions. Extract structured builder data from this description.
@@ -135,18 +154,13 @@ Return JSON with this exact structure:
 Infer reasonable defaults for any fields not explicitly mentioned in the description. Be thorough and specific.`,
       },
     ],
-    temperature: 0.3,
-    response_format: { type: "json_object" },
-  });
-
-  const text = completion.choices[0]?.message?.content ?? "";
+    { temperature: 0.3, json: true }
+  );
 
   try {
     const parsed = JSON.parse(text) as ExtractedBuilder;
-    // Validate tools array contains only valid IDs
     const validTools = ["file-read", "file-write", "bash", "web-search", "git", "api-calls"];
     parsed.tools = parsed.tools.filter((t) => validTools.includes(t));
-    // Validate tone and outputFormat
     if (parsed.tone !== "strict" && parsed.tone !== "flexible") parsed.tone = "flexible";
     if (!["json", "markdown", "plain"].includes(parsed.outputFormat)) parsed.outputFormat = "markdown";
     return parsed;
@@ -177,9 +191,8 @@ export interface InterviewQuestion {
 export async function generateInterview(
   description: string
 ): Promise<InterviewQuestion[]> {
-  const completion = await groq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
+  const text = await groqChat(
+    [
       {
         role: "user",
         content: `You are a senior software architect and agent design expert. A user wants to build an AI coding agent. Based on their description, generate smart, domain-specific interview questions that will help configure the perfect agent — even if the user is non-technical.
@@ -236,12 +249,8 @@ Example visual for React vs Next.js:
 Make EVERY option beginner-friendly with clear descriptions AND visuals.`,
       },
     ],
-    temperature: 0.4,
-    max_tokens: 4096,
-    response_format: { type: "json_object" },
-  });
-
-  const text = completion.choices[0]?.message?.content ?? "";
+    { temperature: 0.4, max_tokens: 4096, json: true }
+  );
 
   try {
     const parsed = JSON.parse(text);
@@ -259,9 +268,8 @@ export async function buildFromInterview(params: {
     .map(([q, a]) => `Q: ${q}\nA: ${a}`)
     .join("\n\n");
 
-  const completion = await groq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
+  const text = await groqChat(
+    [
       {
         role: "user",
         content: `You are a senior software architect. Based on the user's project description and their answers to technical questions, generate a comprehensive agent configuration.
@@ -286,12 +294,8 @@ Return JSON:
 }`,
       },
     ],
-    temperature: 0.3,
-    max_tokens: 4096,
-    response_format: { type: "json_object" },
-  });
-
-  const text = completion.choices[0]?.message?.content ?? "";
+    { temperature: 0.3, max_tokens: 4096, json: true }
+  );
 
   try {
     const parsed = JSON.parse(text) as ExtractedBuilder;
@@ -324,9 +328,8 @@ export async function generateAgent(params: {
   exampleInput: string;
   exampleOutput: string;
 }): Promise<GeneratedAgent> {
-  const completion = await groq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
+  const text = await groqChat(
+    [
       {
         role: "user",
         content: `You are a world-class software architect and Claude Code agent expert. Generate the most comprehensive, production-ready agent setup possible.
@@ -394,12 +397,8 @@ Return JSON:
 }`,
       },
     ],
-    temperature: 0.5,
-    max_tokens: 8000,
-    response_format: { type: "json_object" },
-  });
-
-  const text = completion.choices[0]?.message?.content ?? "";
+    { temperature: 0.5, max_tokens: 8000, json: true }
+  );
 
   try {
     return JSON.parse(text) as GeneratedAgent;
