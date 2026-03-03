@@ -1,6 +1,12 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let _groq: Groq | null = null;
+function groq(): Groq {
+  if (!_groq) {
+    _groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return _groq;
+}
 
 export interface PromptAnalysis {
   score: number;
@@ -18,7 +24,7 @@ export interface GeneratedAgent {
 export async function analyzePrompt(
   description: string
 ): Promise<PromptAnalysis> {
-  const completion = await groq.chat.completions.create({
+  const completion = await groq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -62,7 +68,7 @@ Only suggest what's genuinely missing. If the description is thorough, give fewe
 }
 
 export async function improvePrompt(description: string): Promise<string> {
-  const completion = await groq.chat.completions.create({
+  const completion = await groq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -105,7 +111,7 @@ export interface ExtractedBuilder {
 export async function extractBuilderData(
   description: string
 ): Promise<ExtractedBuilder> {
-  const completion = await groq.chat.completions.create({
+  const completion = await groq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -171,7 +177,7 @@ export interface InterviewQuestion {
 export async function generateInterview(
   description: string
 ): Promise<InterviewQuestion[]> {
-  const completion = await groq.chat.completions.create({
+  const completion = await groq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -253,7 +259,7 @@ export async function buildFromInterview(params: {
     .map(([q, a]) => `Q: ${q}\nA: ${a}`)
     .join("\n\n");
 
-  const completion = await groq.chat.completions.create({
+  const completion = await groq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
@@ -318,7 +324,7 @@ export async function generateAgent(params: {
   exampleInput: string;
   exampleOutput: string;
 }): Promise<GeneratedAgent> {
-  const completion = await groq.chat.completions.create({
+  const completion = await groq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       {
