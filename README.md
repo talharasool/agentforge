@@ -124,6 +124,46 @@ public/
 3. Add `GROQ_API_KEY` to environment variables
 4. Deploy
 
+## SEO Setup Guide
+
+After deploying, follow these steps to get indexed by search engines:
+
+### 1. Google Search Console
+1. Go to [Google Search Console](https://search.google.com/search-console)
+2. Add your site URL (e.g. `https://agentforge.vercel.app`)
+3. Choose **HTML tag** verification method — copy the `content` value
+4. Add it to your Vercel environment variables as `NEXT_PUBLIC_GOOGLE_VERIFICATION`
+5. Redeploy, then click **Verify** in Search Console
+6. Go to **Sitemaps** → submit `https://your-domain.com/sitemap.xml`
+
+### 2. Bing Webmaster Tools
+1. Go to [Bing Webmaster Tools](https://www.bing.com/webmasters)
+2. Add your site URL
+3. Choose **HTML meta tag** verification — copy the `content` value
+4. Add it to Vercel env vars as `NEXT_PUBLIC_BING_VERIFICATION`
+5. Redeploy, then verify
+6. Submit your sitemap: `https://your-domain.com/sitemap.xml`
+
+### 3. Open Graph Image
+1. Create a 1200x630px image for social sharing previews
+2. Save it as `public/og-image.png`
+3. Commit and redeploy — links shared on Twitter, LinkedIn, Facebook will show the image
+
+### 4. Environment Variables for SEO
+```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+NEXT_PUBLIC_GOOGLE_VERIFICATION=your-google-verification-code
+NEXT_PUBLIC_BING_VERIFICATION=your-bing-verification-code
+NEXT_PUBLIC_YANDEX_VERIFICATION=your-yandex-verification-code
+```
+
+### What's Already Built-In
+- `robots.txt` — allows all crawlers, blocks `/api/` routes
+- `sitemap.xml` — auto-generated with correct URLs
+- Open Graph & Twitter Card meta tags
+- JSON-LD structured data (WebApplication schema)
+- Canonical URLs
+
 ## Author
 
 Made with love by **Talha Rasool**
